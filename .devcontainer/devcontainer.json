@@ -1,6 +1,9 @@
 {
   "name": "Python Development Environment",
   "image": "python:3.11-slim",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
   "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
   "customizations": {
     "vscode": {
