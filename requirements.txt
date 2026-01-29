@@ -1,2 +1,4 @@
 music21
 jupyter
+pretty_midi
+scipy
