@@ -77,7 +77,7 @@ def create_sitar_drone():
 # ==========================================
 
 # --- Movement I: The Golden Cage (Alaap) ---
-def generate_alaap(duration_quarters=32):
+def generate_alaap(duration_quarters=128):
     """
     Generates a free-form Alaap in Raag Yaman using weighted probabilities.
     """
@@ -117,8 +117,8 @@ def generate_fracture_texture():
     fracture_stream = stream.Part()
     fracture_stream.insert(0, instrument.Violoncello()) # Using Cello for the texture
     
-    # Loop for 8 bars (approx 32 quarter lengths)
-    for i in range(16):
+    # Loop for 32 bars (approx 128 quarter lengths) - extended for proper development
+    for i in range(64):
         # The Clash: G vs G#
         n1 = note.Note('G3')   # Shuddha Ma (Revolution)
         n2 = note.Note('G#3')  # Tivra Ma (Tradition)
@@ -161,8 +161,8 @@ def generate_rock_riff():
     riff_stream = stream.Part()
     riff_stream.insert(0, instrument.ElectricGuitar())
     
-    # Create 4 iterations of the 4-bar progression
-    for _ in range(4):
+    # Create 8 iterations of the 4-bar progression (extended for full development)
+    for _ in range(8):
         # Bar 1: D Major (Power)
         riff_stream.append(make_power_chord('D3', 4.0)) 
         
@@ -234,7 +234,7 @@ def generate_synthesis_melody():
     safe_note_names = [p.nameWithOctave for p in yaman_scale]
 
     # Locked to the 4/4 grid (no rubato, straight 8ths) 
-    for _ in range(8 * 8): # 8 bars of 8th notes
+    for _ in range(16 * 8): # 16 bars of 8th notes (extended to match rock section)
         n = note.Note(random.choice(safe_note_names))
         n.quarterLength = 0.5 # Straight 8ths match the rock drums
         synthesis_part.append(n)
@@ -257,21 +257,21 @@ def build_sahar_e_nau():
     
     # 1. Generate Parts
     print("Generating Movement I: Alaap...")
-    sitar_alaap = generate_alaap(duration_quarters=32)
+    sitar_alaap = generate_alaap(duration_quarters=128)  # ~1:47 at 72 BPM
     sitar_drone = create_sitar_drone()
     
     print("Generating Movement II: Fracture...")
-    fracture = generate_fracture_texture()
+    fracture = generate_fracture_texture()  # 128 QL
     
     print("Generating Movement III: Rock Anthem...")
-    guitar_riff = generate_rock_riff()
+    guitar_riff = generate_rock_riff()  # 128 QL (8 iterations × 4 bars × 4 QL)
     
     # Generate Drums: Create a Part and repeat the Keherwa cycle
     drums_part = stream.Part()
     drums_part.insert(0, instrument.UnpitchedPercussion()) # Placeholder 
     keherwa_bar = create_keherwa_cycle()
-    # Repeat the bar for the duration of the rock section (approx 16 bars)
-    for _ in range(16):
+    # Repeat the bar for the duration of the rock section (32 bars to match extended guitar)
+    for _ in range(32):
         # We deepcopy the measure to avoid reference issues
         import copy
         drums_part.append(copy.deepcopy(keherwa_bar))
@@ -289,14 +289,14 @@ def build_sahar_e_nau():
     master_sitar.id = 'Sitar'
     master_sitar.insert(0, instrument.Sitar())
     
-    # Mov I (0-32 QL)
+    # Mov I (0-128 QL)
     for element in sitar_alaap.recurse().notes:
         master_sitar.insert(element.offset, element)
     
     # Mov IV (Synthesis) - entering later
     # Calculate offset based on previous sections (Mov I + II + III)
-    # Mov I (32) + Mov II (32) + Mov III (64) = 128 QL start
-    synthesis_start_offset = 32 + 32 + 64
+    # Mov I (128) + Mov II (128) + Mov III (128) = 384 QL start
+    synthesis_start_offset = 128 + 128 + 128
     for element in sitar_synthesis.recurse().notes:
         master_sitar.insert(synthesis_start_offset + element.offset, element)
 
@@ -304,24 +304,24 @@ def build_sahar_e_nau():
     master_cello = stream.Part()
     master_cello.id = 'Cello'
     master_cello.insert(0, instrument.Violoncello())
-    # Enter at Mov II (Offset 32)
+    # Enter at Mov II (Offset 128)
     for element in fracture.recurse().notes:
-        master_cello.insert(32 + element.offset, element)
+        master_cello.insert(128 + element.offset, element)
 
     # -- Constructing the Guitar Part --
     master_guitar = stream.Part()
     master_guitar.id = 'Guitar'
     master_guitar.insert(0, instrument.ElectricGuitar())
-    # Enter at Mov III (Offset 64)
+    # Enter at Mov III (Offset 256)
     for element in guitar_riff.recurse().notes:
-        master_guitar.insert(64 + element.offset, element)
+        master_guitar.insert(256 + element.offset, element)
 
     # -- Constructing the Drum Part --
     master_drums = stream.Part()
     master_drums.id = 'Drums'
     master_drums.insert(0, instrument.UnpitchedPercussion())
-    # Enter at Mov III (Offset 64) with metric modulation
-    current_drum_offset = 64
+    # Enter at Mov III (Offset 256) with metric modulation
+    current_drum_offset = 256
     for measure in drums_part:
         master_drums.insert(current_drum_offset, measure)
         current_drum_offset += 4.0
@@ -330,9 +330,9 @@ def build_sahar_e_nau():
     # Initial Tempo (Ghazal)
     score.insert(0, tempo.MetronomeMark(number=72))
     
-    # Modulation at Rock Section (Mov III, Offset 64)
+    # Modulation at Rock Section (Mov III, Offset 256)
     # 72 * 1.5 = 108 BPM
-    score.insert(64, tempo.MetronomeMark(number=108))
+    score.insert(256, tempo.MetronomeMark(number=108))
 
     # Add all parts to score
     score.insert(0, master_sitar)
