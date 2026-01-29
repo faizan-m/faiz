@@ -3,7 +3,8 @@
 # Usage: ./midi_to_wav.sh [input.mid] [output.wav]
 #   Or:  ./midi_to_wav.sh [directory]  (converts all .mid files in directory)
 
-set -e
+# Don't exit on errors for individual files
+set +e
 
 # Default soundfont location (Debian/Ubuntu)
 SOUNDFONT="/usr/share/sounds/sf2/FluidR3_GM.sf2"
