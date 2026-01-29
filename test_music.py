@@ -332,6 +332,56 @@ class TestBuildSaharENau:
         score = music.build_sahar_e_nau()
         notes = list(score.recurse().notes)
         assert len(notes) > 0, "Score should have notes"
+    
+    def test_score_exportable_to_midi(self):
+        """Test that score can be exported to MIDI format."""
+        import tempfile
+        import os
+        score = music.build_sahar_e_nau()
+        
+        # Create a temporary file for MIDI export
+        with tempfile.NamedTemporaryFile(suffix='.mid', delete=False) as tmp:
+            tmp_path = tmp.name
+        
+        try:
+            # Organize into measures before MIDI export (required by music21)
+            score_with_measures = score.makeMeasures()
+            
+            # Attempt to write MIDI file
+            score_with_measures.write('midi', fp=tmp_path)
+            
+            # Verify file was created and has content
+            assert os.path.exists(tmp_path), "MIDI file should be created"
+            assert os.path.getsize(tmp_path) > 0, "MIDI file should have content"
+        finally:
+            # Clean up
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+    
+    def test_score_exportable_to_musicxml(self):
+        """Test that score can be exported to MusicXML format."""
+        import tempfile
+        import os
+        score = music.build_sahar_e_nau()
+        
+        # Create a temporary file for MusicXML export
+        with tempfile.NamedTemporaryFile(suffix='.xml', delete=False) as tmp:
+            tmp_path = tmp.name
+        
+        try:
+            # Organize into measures before export (recommended for proper notation)
+            score_with_measures = score.makeMeasures()
+            
+            # Attempt to write MusicXML file
+            score_with_measures.write('musicxml', fp=tmp_path)
+            
+            # Verify file was created and has content
+            assert os.path.exists(tmp_path), "MusicXML file should be created"
+            assert os.path.getsize(tmp_path) > 0, "MusicXML file should have content"
+        finally:
+            # Clean up
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
 
 
 class TestIntegration:
